@@ -1,13 +1,13 @@
-# FROM node:6-stretch
-FROM node:18.13.0
+FROM node:18
 
-RUN mkdir /usr/src/goof
-RUN mkdir /tmp/extracted_files
-COPY . /usr/src/goof
-WORKDIR /usr/src/goof
+WORKDIR /app
 
-RUN npm update
+COPY package*.json ./
+
 RUN npm install
-EXPOSE 3001
-EXPOSE 9229
-ENTRYPOINT ["npm", "start"]
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
