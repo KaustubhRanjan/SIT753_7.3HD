@@ -67,6 +67,13 @@ app.get('/chat', routes.chat.get);
 app.put('/chat', routes.chat.add);
 app.delete('/chat', routes.chat.delete);
 app.use('/users', routesUsers)
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: "UP",
+    service: "SIT753 7.3HD Goof App",
+    timestamp: new Date().toISOString()
+  });
+});
 
 // Static
 app.use(st({ path: './public', url: '/public' }));

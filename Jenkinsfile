@@ -1,11 +1,12 @@
 pipeline {
     agent any
-
+    
     environment {
-        SONAR_TOKEN = credentials('SONAR_TOKEN')
-        IMAGE_NAME = "kaustubh-sit753-7-3hd"
-        CONTAINER_NAME = "kaustubh-sit753-container"
-        APP_PORT = "3000"
+       SONAR_TOKEN = credentials('SONAR_TOKEN')
+       SNYK_TOKEN = credentials('SNYK_TOKEN')
+       IMAGE_NAME = "kaustubh-sit753-7-3hd"
+       CONTAINER_NAME = "kaustubh-sit753-container"
+       APP_PORT = "3000"
     }
 
     stages {
@@ -43,10 +44,13 @@ pipeline {
 
         stage('Security') {
             steps {
-                echo 'Running npm audit security scan'
-                bat 'npm audit || exit /b 0'
+               echo 'Running security scans'
+               bat 'npm audit || exit /b 0'
+               bat 'npm install -g snyk'
+               bat 'snyk auth %SNYK_TOKEN%'
+               bat 'snyk test || exit /b 0'
             }
-        }
+       }
 
         stage('Deploy') {
             steps {
@@ -63,15 +67,16 @@ pipeline {
             }
         }
 
-        stage('Monitoring') {
+       stage('Monitoring') {
             steps {
-                echo 'Monitoring deployed application'
+                echo 'Monitoring stage: checking deployed application health and container metrics'
                 bat 'docker ps'
-                bat 'curl -I http://localhost:%APP_PORT% || exit /b 0'
+                bat 'curl http://localhost:%APP_PORT%/health || exit /b 0'
+                bat 'docker stats %CONTAINER_NAME% --no-stream || exit /b 0'
                 bat 'docker logs %CONTAINER_NAME% --tail 20 || exit /b 0'
             }
         }
-    }
+    } 
 
     post {
         success {
