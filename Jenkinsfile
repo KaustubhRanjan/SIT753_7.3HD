@@ -6,7 +6,7 @@ pipeline {
        SNYK_TOKEN = credentials('SNYK_TOKEN')
        IMAGE_NAME = "kaustubh-sit753-7-3hd"
        CONTAINER_NAME = "kaustubh-sit753-container"
-       APP_PORT = "3000"
+       APP_PORT = "3001"
     }
 
     stages {
@@ -52,13 +52,13 @@ pipeline {
             }
        }
 
-        stage('Deploy') {
-            steps {
-                echo 'Deploying Docker container'
-                bat 'docker rm -f %CONTAINER_NAME% || exit /b 0'
-                bat 'docker run -d --name %CONTAINER_NAME% -p %APP_PORT%:3000 %IMAGE_NAME%:latest'
-            }
-        }
+       stage('Deploy') {
+    steps {
+        echo 'Deploying application using Docker Compose'
+        bat 'docker compose down || exit /b 0'
+        bat 'docker compose up -d --build'
+    }
+}
 
         stage('Release') {
             steps {
@@ -71,7 +71,7 @@ pipeline {
             steps {
                 echo 'Monitoring stage: checking deployed application health and container metrics'
                 bat 'docker ps'
-                bat 'curl http://localhost:%APP_PORT%/health || exit /b 0'
+                bat 'curl http://localhost:%APP_PORT% || exit /b 0'
                 bat 'docker stats %CONTAINER_NAME% --no-stream || exit /b 0'
                 bat 'docker logs %CONTAINER_NAME% --tail 20 || exit /b 0'
             }
