@@ -52,9 +52,12 @@ pipeline {
             }
        }
 
-       stage('Deploy') {
+      stage('Deploy') {
     steps {
         echo 'Deploying application using Docker Compose'
+        bat 'docker rm -f kaustubh-sit753-container || exit /b 0'
+        bat 'docker rm -f goof-mongo || exit /b 0'
+        bat 'docker rm -f goof-mysql || exit /b 0'
         bat 'docker compose down || exit /b 0'
         bat 'docker compose up -d --build'
     }
