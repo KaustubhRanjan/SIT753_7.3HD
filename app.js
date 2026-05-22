@@ -6,7 +6,6 @@
 require('./mongoose-db');
 require('./typeorm-db')
 
-//demo rum
 
 var st = require('st');
 var crypto = require('crypto');
@@ -95,6 +94,3 @@ console.log('token: ' + token);
 http.createServer(app).listen(app.get('port'), function () {
   console.log('Express server listening on port ' + app.get('port'));
 });
-
-
-//demo trigger
